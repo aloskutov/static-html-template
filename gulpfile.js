@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const { src, dest } = require("gulp");
 const gulp = require("gulp");
@@ -52,12 +52,25 @@ var vendor = {
   }
 };
 
-/* Tasks */
-function browserSync(done) {
-  browsersync.init({
+var config = {
+  server: {
     server: { baseDir: "./dist/" },
     port: 3000
-  });
+  },
+  panini: {
+    root: 'src/',
+    layouts: 'src/templates/layouts/',
+    partials: 'src/templates/partials/',
+    helpers: 'src/templates/helpers/',
+    data: 'src/templates/data/'
+  }
+};
+
+
+
+/* Tasks */
+function browserSync(done) {
+  browsersync.init(config.server);
   done();
 }
 
@@ -68,33 +81,27 @@ function browserSyncReload(done) {
 
 function bootstrap_css() {
   return src(vendor.src.bootstrap_css)
-  .pipe(plumber())
-  .pipe(dest(vendor.build.bootstrap_css));
+    .pipe(plumber())
+    .pipe(dest(vendor.build.bootstrap_css));
 }
 
 function bootstrap_js() {
   return src(vendor.src.bootstrap_js)
-  .pipe(plumber())
-  .pipe(dest(vendor.build.bootstrap_js));
+    .pipe(plumber())
+    .pipe(dest(vendor.build.bootstrap_js));
 }
 
 function jquery() {
   return src(vendor.src.jquery)
-  .pipe(plumber())
-  .pipe(dest(vendor.build.jquery));
+    .pipe(plumber())
+    .pipe(dest(vendor.build.jquery));
 }
 
 function html() {
   panini.refresh();
   return src(path.src.html, { base: "src/" })
     .pipe(plumber())
-    .pipe(panini({
-      root: 'src/',
-      layouts: 'src/templates/layouts/',
-      partials: 'src/templates/partials/',
-      helpers: 'src/templates/helpers/',
-      data: 'src/templates/data/'
-    }))
+    .pipe(panini(config.panini))
     .pipe(dest(path.build.html))
     .pipe(browsersync.stream());
 }
