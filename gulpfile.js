@@ -73,6 +73,9 @@ var options = {
     Browserslist: ['last 8 versions'],
     cascade: true
   },
+  cssbeautify: {
+    indent: "  ",
+  },
   rename: {
     suffix: '.min'
   }
@@ -121,7 +124,7 @@ function styles() {
     .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
     .pipe(autoprefixer(options.autoprefixer))
-    .pipe(cssbeautify())
+    .pipe(cssbeautify(options.cssbeautify))
     .pipe(dest(path.build.css))
     .pipe(cleancss())
     .pipe(removeCSSComments())
