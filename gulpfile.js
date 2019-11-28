@@ -16,6 +16,9 @@ const del = require('del');
 const panini = require('panini');
 const browsersync = require('browser-sync').create();
 
+sass.compiler = require('node-sass');
+//sass.compiler = require('dart-sass');
+
 /* Paths */
 var path = {
   build: {
