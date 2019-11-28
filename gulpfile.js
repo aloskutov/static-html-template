@@ -56,8 +56,8 @@ var vendor = {
   }
 };
 
-/* Config */
-var config = {
+/* Options */
+var options = {
   server: {
     server: { baseDir: './build/' },
     port: 3000
@@ -80,7 +80,7 @@ var config = {
 
 /* Tasks */
 function browserSync(done) {
-  browsersync.init(config.server);
+  browsersync.init(options.server);
   done();
 }
 
@@ -111,7 +111,7 @@ function html() {
   panini.refresh();
   return src(path.src.html, { base: 'src/' })
     .pipe(plumber())
-    .pipe(panini(config.panini))
+    .pipe(panini(options.panini))
     .pipe(dest(path.build.html))
     .pipe(browsersync.stream());
 }
@@ -120,12 +120,12 @@ function styles() {
   return src(path.src.css, { base: 'src/assets/sass' })
     .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
-    .pipe(autoprefixer(config.autoprefixer))
+    .pipe(autoprefixer(options.autoprefixer))
     .pipe(cssbeautify())
     .pipe(dest(path.build.css))
     .pipe(cleancss())
     .pipe(removeCSSComments())
-    .pipe(rename(config.rename))
+    .pipe(rename(options.rename))
     .pipe(dest(path.build.css))
     .pipe(browsersync.stream());
 }
@@ -136,7 +136,7 @@ function scripts() {
     .pipe(rigger())
     .pipe(gulp.dest(path.build.js))
     .pipe(uglify())
-    .pipe(rename(config.rename))
+    .pipe(rename(options.rename))
     .pipe(dest(path.build.js))
     .pipe(browsersync.stream());
 }
