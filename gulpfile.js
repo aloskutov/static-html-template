@@ -1,23 +1,20 @@
 'use strict';
 
-const { src, dest } = require('gulp');
-const gulp = require('gulp');
-const autoprefixer = require('gulp-autoprefixer');
-const cssbeautify = require('gulp-cssbeautify');
-const removeCSSComments = require('gulp-strip-css-comments');
-const rename = require('gulp-rename');
-const sass = require('gulp-sass');
-const cleancss = require('gulp-clean-css');
-const rigger = require('gulp-rigger');
-const uglify = require('gulp-uglify');
-const plumber = require('gulp-plumber');
-const imagemin = require('gulp-imagemin');
-const del = require('del');
-const panini = require('panini');
-const browsersync = require('browser-sync').create();
-
-sass.compiler = require('node-sass');
-//sass.compiler = require('dart-sass');
+const { src, dest, task } = pkg;
+import pkg from 'gulp';
+import autoprefixer from 'gulp-autoprefixer';
+import cssbeautify from 'gulp-cssbeautify';
+import removeCSSComments from 'gulp-strip-css-comments';
+import rename from 'gulp-rename';
+import sass from 'gulp-dart-sass';
+import cleancss from 'gulp-clean-css';
+import rigger from 'gulp-rigger';
+import uglify from 'gulp-uglify';
+import plumber from 'gulp-plumber';
+import imagemin from 'gulp-imagemin';
+import del from 'del';
+import panini from 'panini';
+import browsersync from 'browser-sync';
 
 /* Paths */
 var path = {
@@ -82,35 +79,35 @@ var options = {
 };
 
 /* Tasks */
-function browserSync(done) {
+const browserSync = (done) => {
   browsersync.init(options.server);
   done();
 }
 
-function browserSyncReload(done) {
+const browserSyncReload = (done) => {
   browsersync.reload();
   done();
 }
 
-function bootstrap_css() {
+const bootstrap_css = () => {
   return src(vendor.src.bootstrap_css)
     .pipe(plumber())
     .pipe(dest(vendor.build.bootstrap_css));
 }
 
-function bootstrap_js() {
+const bootstrap_js = () => {
   return src(vendor.src.bootstrap_js)
     .pipe(plumber())
     .pipe(dest(vendor.build.bootstrap_js));
 }
 
-function jquery() {
+const jquery = () => {
   return src(vendor.src.jquery)
     .pipe(plumber())
     .pipe(dest(vendor.build.jquery));
 }
 
-function html() {
+const html = () => {
   panini.refresh();
   return src(path.src.html, { base: 'src/' })
     .pipe(plumber())
@@ -119,7 +116,7 @@ function html() {
     .pipe(browsersync.stream());
 }
 
-function styles() {
+const styles = () => {
   return src(path.src.css, { base: 'src/assets/sass' })
     .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
@@ -133,53 +130,38 @@ function styles() {
     .pipe(browsersync.stream());
 }
 
-function scripts() {
+const scripts = () => {
   return src(path.src.js, { base: 'src/assets/js' })
     .pipe(plumber())
     .pipe(rigger())
-    .pipe(gulp.dest(path.build.js))
+    .pipe(dest(path.build.js))
     .pipe(uglify())
     .pipe(rename(options.rename))
     .pipe(dest(path.build.js))
     .pipe(browsersync.stream());
 }
 
-function images() {
+const images = () => {
   return src(path.src.img, { base: 'src/assets/img' })
     .pipe(imagemin())
     .pipe(dest(path.build.img));
 }
 
-function clean() {
+const clean = () => {
   return del(path.clean);
 }
 
-function watchFiles() {
-  gulp.watch([path.watch.html], html);
-  gulp.watch([path.watch.css], styles);
-  gulp.watch([path.watch.js], scripts);
-  gulp.watch([path.watch.img], images);
+const watchFiles = () => {
+  pkg.watch([path.watch.html], html);
+  pkg.watch([path.watch.css], styles);
+  pkg.watch([path.watch.js], scripts);
+  pkg.watch([path.watch.img], images);
 }
 
-const vendors = gulp.parallel(bootstrap_css, bootstrap_js, jquery);
-const build = gulp.series(clean, gulp.parallel(html, scripts, styles, images, vendors));
-const watch = gulp.parallel(build, watchFiles, browserSync);
+const vendors = pkg.parallel(bootstrap_css, bootstrap_js, jquery);
+const build = pkg.series(clean, pkg.parallel(html, scripts, styles, images, vendors));
+const watch = pkg.parallel(build, watchFiles, browserSync);
 
-/* Exports */
-exports.html = html;
-exports.styles = styles;
-exports.scripts = scripts;
-exports.images = images;
-exports.clean = clean;
-exports.build = build;
-exports.watch = watch;
-exports.default = watch;
-
-exports.bootstrap_css = bootstrap_css;
-exports.bootstrap_css = bootstrap_js;
-exports.jquery = jquery;
-exports.vendors = vendors;
-
-exports.watchFiles = watchFiles;
-exports.browserSync = browserSync;
-exports.browserSyncReload = browserSyncReload;
+export default watch;
+task('clean', clean);
+task('build', build);
